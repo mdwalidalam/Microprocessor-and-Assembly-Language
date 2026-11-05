@@ -1,0 +1,79 @@
+; ========================================================
+; Question 2: Sort Single Decimal Digits in Descending Order
+; EMU8086 / DOS 16-bit Assembly Format
+; ========================================================
+
+org 100h
+
+.model small
+.stack 100h
+
+.data
+    msg_in   db 'Input Array: 573829143$'
+    msg_out  db 0Ah, 0Dh, 'Sorted (Descending): $'
+    
+    ; Array of numbers provided in sample input
+    arr      db 5, 7, 3, 8, 2, 9, 1, 4, 3
+    arr_len  dw 9
+
+.code
+main proc
+    mov ax, @data
+    mov ds, ax
+
+    ; Print Input message
+    mov ah, 09h
+    lea dx, msg_in
+    int 21h
+
+    ; --- Bubble Sort Algorithm (Descending Order) ---
+    mov cx, arr_len
+    dec cx          ; Outer loop count = n - 1
+
+outer_loop:
+    mov dx, cx      ; Save outer loop counter
+    lea si, arr     ; Reset SI to start of array
+
+inner_loop:
+    mov al, [si]        ; AL = current element
+    mov bl, [si + 1]    ; BL = next element
+
+    ; For descending order, if current < next, swap them
+    cmp al, bl
+    jge no_swap
+    
+    ; Swap elements
+    mov [si], bl
+    mov [si + 1], al
+
+no_swap:
+    inc si
+    dec dx
+    jnz inner_loop
+
+    loop outer_loop
+
+    ; Print Output message
+    mov ah, 09h
+    lea dx, msg_out
+    int 21h
+
+    ; Display Sorted Array Elements
+    mov cx, arr_len
+    lea si, arr
+
+print_array:
+    mov dl, [si]
+    add dl, 30h     ; Convert digit to character
+    mov ah, 02h
+    int 21h
+
+    inc si
+    loop print_array
+
+    ; Exit program
+    mov ax, 4C00h
+    int 21h
+main endp
+
+end main
